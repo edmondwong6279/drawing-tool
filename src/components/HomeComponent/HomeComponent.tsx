@@ -1,6 +1,7 @@
 // import CanvasComponent from 'components/CanvasComponent';
 import LoadingComponent from 'components/LoadingComponent';
-import MoreCanvasComponent from 'components/MoreCanvasComponent';
+// import MoreCanvasComponent from 'components/MoreCanvasComponent';
+import LayeredCanvasComponent from 'components/LayeredCanvasComponent';
 import { useState } from 'react';
 import styles from './HomeComponent.module.scss';
 
@@ -12,7 +13,8 @@ const HomeComponent = () => {
 			<div className={styles.container}>
 				{loading && <LoadingComponent />}
 				{/* <CanvasComponent setLoading={setLoading} /> */}
-				<MoreCanvasComponent setLoading={setLoading} />
+				{/* <MoreCanvasComponent setLoading={setLoading} /> */}
+				<LayeredCanvasComponent setLoading={setLoading} />
 			</div>
 		</div>
 	);
