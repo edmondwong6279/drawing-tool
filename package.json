@@ -20,6 +20,8 @@
     "fix": "concurrently yarn:lint:scripts:fix yarn:lint:styles:fix"
   },
   "dependencies": {
+    "@types/animejs": "^3.1.5",
+    "animejs": "^3.2.1",
     "csv-parse": "^5.2.0",
     "dotenv": "^16.0.0",
     "fast-csv": "^4.3.6",

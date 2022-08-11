@@ -34,15 +34,6 @@ const MoreCanvasComponent: React.ComponentType<MoreCanvasComponentProps> = ({ se
 		return finalHexString;
 	}
 
-	function transitionColor(start: string, end: string) {
-		const hexSet = '0123456789ABCDEF';
-		let finalHexString = '#';
-		for (let i = 0; i < 6; i++) {
-			finalHexString += hexSet[Math.ceil(Math.random() * 15)];
-		}
-		return finalHexString;
-	}
-
 	// set up, only called once
 	useEffect(() => {
 		setLoading(false);

@@ -5,6 +5,7 @@
 /* eslint-disable no-console */
 import styles from './LayeredCanvasComponent.module.scss';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+// import anime from 'animejs';
 
 export type LayeredCanvasComponentProps = {
 	setLoading: Dispatch<SetStateAction<boolean>>;
@@ -27,6 +28,15 @@ const LayeredCanvasComponent: React.ComponentType<LayeredCanvasComponentProps> =
 	const [offsetLeft, setOffsetLeft] = useState(0);
 	const [offsetTop, setOffsetTop] = useState(0);
 	const dimension = 1000;
+
+	// anime({
+	// 	targets: brushConfig,
+	// 	round: 1,
+	// 	easing: 'linear',
+	// 	update: () => {
+	// 		console.log(brushConfig);
+	// 	},
+	// });
 
 	// returns a new hex string for the strobey colours
 	function generateColor() {
@@ -58,7 +68,6 @@ const LayeredCanvasComponent: React.ComponentType<LayeredCanvasComponentProps> =
 
 	// set up, only called once
 	useEffect(() => {
-		setLoading(false);
 		if (canvasDrawing.current !== null && canvasCursor.current !== null) {
 			canvasDrawing.current.width = dimension;
 			canvasDrawing.current.height = dimension;
@@ -94,6 +103,8 @@ const LayeredCanvasComponent: React.ComponentType<LayeredCanvasComponentProps> =
 			ctxDrawing.scale(dpr, dpr);
 			// [ctxCursor.strokeStyle, ctxCursor.lineWidth] = brushConfig;
 			[ctxDrawing.strokeStyle, ctxDrawing.lineWidth] = brushConfig;
+			drawMouse(...brushConfig);
+			setLoading(false);
 		}
 	}, [ctxDrawing, ctxCursor]);
 
@@ -131,7 +142,7 @@ const LayeredCanvasComponent: React.ComponentType<LayeredCanvasComponentProps> =
 			[ctxDrawing.strokeStyle, ctxDrawing.lineWidth] = brushConfig;
 			ctxDrawing.beginPath();
 			ctxDrawing.lineCap = 'round';
-			ctxDrawing.moveTo(prevXY[0] - offsetLeft, prevXY[1] - offsetTop);
+			ctxDrawing.moveTo(currXY[0] - offsetLeft, currXY[1] - offsetTop);
 			ctxDrawing.lineTo(currXY[0] - offsetLeft, currXY[1] - offsetTop);
 			ctxDrawing.stroke();
 		}
@@ -142,25 +153,31 @@ const LayeredCanvasComponent: React.ComponentType<LayeredCanvasComponentProps> =
 		if (ctxCursor !== null) {
 			// transition between old config to new
 			const [color, width] = [generateColor(), Math.round(Math.random() * 200 + 20)];
-			const [R, G, B] = [
-				parseInt(color.slice(1, 3), 16),
-				parseInt(color.slice(3, 5), 16),
-				parseInt(color.slice(5, 7), 16),
-			];
-			console.log(R);
-			console.log((R + 1).toString(16));
-			console.log(G);
-			console.log((G + 1).toString(16));
-			console.log(B);
-			console.log((B + 1).toString(16));
-			for (let i = 0; i < 1; i += 0.1) {
-				// Math.round();
-				// drawMouse(color, width);
-			}
 			setBrushConfig([color, width]);
 			drawMouse(color, width);
 		}
 	};
+
+	// const requestRef = useRef();
+	// const previousTimeRef = useRef();
+
+	// const animate = (time: number) => {
+	// 	// Change the state according to the animation
+	// 	if (previousTimeRef.current != undefined) {
+	// 		const deltaTime = time - previousTimeRef.current;
+
+	// 		// Pass on a function to the setter of the state
+	// 		// to make sure we always have the latest state
+	// 		setCount((prevCount) => (prevCount + deltaTime * 0.01) % 100);
+	// 	}
+	// 	previousTimeRef.current = time;
+	// 	requestRef.current = requestAnimationFrame(animate);
+	// };
+
+	// useEffect(() => {
+	// 	requestRef.current = requestAnimationFrame(animate);
+	// 	return () => cancelAnimationFrame(requestRef.current);
+	// }, []); // Make sure the effect runs only once
 
 	return (
 		<div className={styles.container}>
