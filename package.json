@@ -20,7 +20,6 @@
     "fix": "concurrently yarn:lint:scripts:fix yarn:lint:styles:fix"
   },
   "dependencies": {
-    "cannon-es": "^0.19.0",
     "csv-parse": "^5.2.0",
     "dotenv": "^16.0.0",
     "fast-csv": "^4.3.6",
@@ -30,9 +29,7 @@
     "next": "^12.1.6",
     "react": "18.0.0",
     "react-dom": "18.0.0",
-    "sass": "^1.32.7",
-    "three": "^0.141.0",
-    "three-orbitcontrols-ts": "^0.1.2"
+    "sass": "^1.32.7"
   },
   "devDependencies": {
     "@types/node": "^17.0.23",
