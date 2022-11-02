@@ -1,9 +1,5 @@
 import styles from './LayeredCanvasComponent.module.scss';
-import React, { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
-
-export type LayeredCanvasComponentProps = {
-	setLoading: Dispatch<SetStateAction<boolean>>;
-};
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 // returns a new hex string for the strobey colours
 const generateColor = () => {
@@ -15,9 +11,7 @@ const generateColor = () => {
 	return finalHexString;
 };
 
-const LayeredCanvasComponent: React.ComponentType<LayeredCanvasComponentProps> = ({
-	setLoading,
-}) => {
+const LayeredCanvasComponent = () => {
 	const canvasCursor = useRef<HTMLCanvasElement | null>(null);
 	const [ctxCursor, setCtxCursor] = useState<CanvasRenderingContext2D | null>(null);
 	const canvasDrawing = useRef<HTMLCanvasElement | null>(null);
@@ -97,11 +91,10 @@ const LayeredCanvasComponent: React.ComponentType<LayeredCanvasComponentProps> =
 			ctxDrawing.scale(dpr, dpr);
 			[ctxDrawing.strokeStyle, ctxDrawing.lineWidth] = brushConfig;
 			drawMouse(...brushConfig);
-			setLoading(false);
 		}
 		// Ignore brush config and draw mouse
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ctxDrawing, ctxCursor, setLoading]);
+	}, [ctxDrawing, ctxCursor]);
 
 	// everytime the cursor moves, update the relevant state to only move cursor
 	const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
