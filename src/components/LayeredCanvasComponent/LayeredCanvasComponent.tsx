@@ -1,14 +1,18 @@
-/* eslint-disable prefer-destructuring */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-console */
 import styles from './LayeredCanvasComponent.module.scss';
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
-// import anime from 'animejs';
+import React, { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 
 export type LayeredCanvasComponentProps = {
 	setLoading: Dispatch<SetStateAction<boolean>>;
+};
+
+// returns a new hex string for the strobey colours
+const generateColor = () => {
+	const hexSet = '0123456789ABCDEF';
+	let finalHexString = '#';
+	for (let i = 0; i < 6; i++) {
+		finalHexString += hexSet[Math.ceil(Math.random() * 15)];
+	}
+	return finalHexString;
 };
 
 const LayeredCanvasComponent: React.ComponentType<LayeredCanvasComponentProps> = ({
@@ -29,42 +33,32 @@ const LayeredCanvasComponent: React.ComponentType<LayeredCanvasComponentProps> =
 	const [offsetTop, setOffsetTop] = useState(0);
 	const dimension = 1000;
 
-	// anime({
-	// 	targets: brushConfig,
-	// 	round: 1,
-	// 	easing: 'linear',
-	// 	update: () => {
-	// 		console.log(brushConfig);
-	// 	},
-	// });
+	const drawMouse = useCallback(
+		(color: string, width: number) => {
+			if (ctxCursor !== null) {
+				ctxCursor.clearRect(0, 0, dimension, dimension);
 
-	// returns a new hex string for the strobey colours
-	function generateColor() {
-		const hexSet = '0123456789ABCDEF';
-		let finalHexString = '#';
-		for (let i = 0; i < 6; i++) {
-			finalHexString += hexSet[Math.ceil(Math.random() * 15)];
-		}
-		return finalHexString;
-	}
+				// the brush
+				ctxCursor.fillStyle = color;
+				ctxCursor.beginPath();
+				ctxCursor.arc(
+					currXY[0] - offsetLeft,
+					currXY[1] - offsetTop,
+					width / 2,
+					0,
+					Math.PI * 2
+				);
+				ctxCursor.fill();
 
-	function drawMouse(color: string, width: number) {
-		if (ctxCursor !== null) {
-			ctxCursor.clearRect(0, 0, dimension, dimension);
-
-			// the brush
-			ctxCursor.fillStyle = color;
-			ctxCursor.beginPath();
-			ctxCursor.arc(currXY[0] - offsetLeft, currXY[1] - offsetTop, width / 2, 0, Math.PI * 2);
-			ctxCursor.fill();
-
-			// the dot
-			ctxCursor.fillStyle = '#000000';
-			ctxCursor.beginPath();
-			ctxCursor.arc(currXY[0] - offsetLeft, currXY[1] - offsetTop, 4, 0, Math.PI * 2);
-			ctxCursor.fill();
-		}
-	}
+				// the dot
+				ctxCursor.fillStyle = '#000000';
+				ctxCursor.beginPath();
+				ctxCursor.arc(currXY[0] - offsetLeft, currXY[1] - offsetTop, 4, 0, Math.PI * 2);
+				ctxCursor.fill();
+			}
+		},
+		[ctxCursor, currXY, offsetLeft, offsetTop]
+	);
 
 	// set up, only called once
 	useEffect(() => {
@@ -101,15 +95,16 @@ const LayeredCanvasComponent: React.ComponentType<LayeredCanvasComponentProps> =
 			canvasDrawing.current.style.height = `${rect.height}px`;
 			ctxCursor.scale(dpr, dpr);
 			ctxDrawing.scale(dpr, dpr);
-			// [ctxCursor.strokeStyle, ctxCursor.lineWidth] = brushConfig;
 			[ctxDrawing.strokeStyle, ctxDrawing.lineWidth] = brushConfig;
 			drawMouse(...brushConfig);
 			setLoading(false);
 		}
-	}, [ctxDrawing, ctxCursor]);
+		// Ignore brush config and draw mouse
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ctxDrawing, ctxCursor, setLoading]);
 
 	// everytime the cursor moves, update the relevant state to only move cursor
-	const handleMouseMove = (e: any) => {
+	const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
 		setPrevXY(currXY);
 		setCurrXY([e.clientX, e.clientY]);
 		if (
@@ -130,7 +125,7 @@ const LayeredCanvasComponent: React.ComponentType<LayeredCanvasComponentProps> =
 		}
 	};
 
-	const handleMouseDown = (_e: any) => {
+	const handleMouseDown = () => {
 		setDraw(true);
 		// draw even if there's just a mouse down
 		if (
@@ -148,7 +143,7 @@ const LayeredCanvasComponent: React.ComponentType<LayeredCanvasComponentProps> =
 		}
 	};
 
-	const handleMouseUp = (_e: any) => {
+	const handleMouseUp = () => {
 		setDraw(false);
 		if (ctxCursor !== null) {
 			// transition between old config to new
@@ -157,27 +152,6 @@ const LayeredCanvasComponent: React.ComponentType<LayeredCanvasComponentProps> =
 			drawMouse(color, width);
 		}
 	};
-
-	// const requestRef = useRef();
-	// const previousTimeRef = useRef();
-
-	// const animate = (time: number) => {
-	// 	// Change the state according to the animation
-	// 	if (previousTimeRef.current != undefined) {
-	// 		const deltaTime = time - previousTimeRef.current;
-
-	// 		// Pass on a function to the setter of the state
-	// 		// to make sure we always have the latest state
-	// 		setCount((prevCount) => (prevCount + deltaTime * 0.01) % 100);
-	// 	}
-	// 	previousTimeRef.current = time;
-	// 	requestRef.current = requestAnimationFrame(animate);
-	// };
-
-	// useEffect(() => {
-	// 	requestRef.current = requestAnimationFrame(animate);
-	// 	return () => cancelAnimationFrame(requestRef.current);
-	// }, []); // Make sure the effect runs only once
 
 	return (
 		<div className={styles.container}>

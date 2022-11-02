@@ -1,16 +1,12 @@
-/* eslint-disable prefer-destructuring */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-console */
-import styles from './MoreCanvasComponent.module.scss';
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+// This was our initial attempt but it gave very bad performance.
+import styles from './SlowCanvasComponent.module.scss';
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 
-export type MoreCanvasComponentProps = {
+export type SlowCanvasComponentProps = {
 	setLoading: Dispatch<SetStateAction<boolean>>;
 };
 
-const MoreCanvasComponent: React.ComponentType<MoreCanvasComponentProps> = ({ setLoading }) => {
+const SlowCanvasComponent: React.ComponentType<SlowCanvasComponentProps> = ({ setLoading }) => {
 	const canvas = useRef<HTMLCanvasElement | null>(null);
 	const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null);
 	const [draw, setDraw] = useState(false);
@@ -42,7 +38,7 @@ const MoreCanvasComponent: React.ComponentType<MoreCanvasComponentProps> = ({ se
 			canvas.current.height = 1000;
 			setCtx(canvas.current.getContext('2d'));
 		}
-	}, []);
+	}, [setLoading]);
 
 	// set up once ctx has been set
 	useEffect(() => {
@@ -58,23 +54,22 @@ const MoreCanvasComponent: React.ComponentType<MoreCanvasComponentProps> = ({ se
 			[ctx.strokeStyle, ctx.lineWidth] = brushConfig;
 			ctx.lineCap = 'round';
 		}
-	}, [ctx]);
+	}, [brushConfig, ctx]);
 
 	useEffect(() => {
 		if (ctx !== null) {
 			drawingState.map((current) => {
 				ctx.beginPath();
-				ctx.strokeStyle = current[4];
-				ctx.lineWidth = current[5];
+				[, , , , ctx.strokeStyle, ctx.lineWidth] = current;
 				ctx.moveTo(current[0], current[1]);
 				ctx.lineTo(current[2], current[3]);
 				ctx.stroke();
 			});
 		}
-	}, [drawingState]);
+	}, [ctx, drawingState]);
 
 	// everytime the cursor moves, update the relevant state to only move cursor
-	const handleMouseMove = (e: any) => {
+	const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
 		setPrevXY(currXY);
 		setCurrXY([e.clientX, e.clientY]);
 
@@ -83,8 +78,7 @@ const MoreCanvasComponent: React.ComponentType<MoreCanvasComponentProps> = ({ se
 			ctx.clearRect(0, 0, 1000, 1000);
 			drawingState.map((current) => {
 				ctx.beginPath();
-				ctx.strokeStyle = current[4];
-				ctx.lineWidth = current[5];
+				[, , , , ctx.strokeStyle, ctx.lineWidth] = current;
 				ctx.moveTo(current[0], current[1]);
 				ctx.lineTo(current[2], current[3]);
 				ctx.stroke();
@@ -103,7 +97,7 @@ const MoreCanvasComponent: React.ComponentType<MoreCanvasComponentProps> = ({ se
 		}
 	};
 
-	const handleMouseDown = (_e: any) => {
+	const handleMouseDown = () => {
 		setDraw(true);
 		if (ctx !== null) {
 			setDrawingState([
@@ -113,7 +107,7 @@ const MoreCanvasComponent: React.ComponentType<MoreCanvasComponentProps> = ({ se
 		}
 	};
 
-	const handleMouseUp = (_e: any) => {
+	const handleMouseUp = () => {
 		setDraw(false);
 		if (ctx !== null) {
 			setBrushConfig([generateColor(), Math.round(Math.random() * 200 + 20)]);
@@ -133,4 +127,4 @@ const MoreCanvasComponent: React.ComponentType<MoreCanvasComponentProps> = ({ se
 	);
 };
 
-export default MoreCanvasComponent;
+export default SlowCanvasComponent;

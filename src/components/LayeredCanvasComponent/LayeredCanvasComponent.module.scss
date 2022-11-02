@@ -3,25 +3,25 @@
 .container {
 	position: relative;
 	width: 100%;
-}
 
-.cursor {
-	position: absolute;
-	z-index: 2;
-	width: 1000px;
-	height: 1000px;
-	border: solid 1px blue;
-	margin: 20px;
-	cursor: none;
-	pointer-events: none;
-}
+	.cursor {
+		position: absolute;
+		z-index: 2;
+		width: 1000px;
+		height: 1000px;
+		border: solid 1px blue;
+		margin: 20px;
+		cursor: none;
+		pointer-events: none;
+	}
 
-.drawing {
-	position: absolute;
-	z-index: 1;
-	width: 1000px;
-	height: 1000px;
-	border: solid 1px red;
-	margin: 20px;
-	cursor: none;
+	.drawing {
+		position: absolute;
+		z-index: 1;
+		width: 1000px;
+		height: 1000px;
+		border: solid 1px red;
+		margin: 20px;
+		cursor: none;
+	}
 }
